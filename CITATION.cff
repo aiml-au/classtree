@@ -1,0 +1,22 @@
+cff-version: "1.2.0"
+title: "Classia"
+message: "If you use this software, please cite both the article from preferred-citation and the software itself."
+authors:
+    - family-names: Valmadre
+      given-names: Jack
+    - name: AIML
+preferred-citation:
+  authors:
+    - family-names: Valmadre
+      given-names: Jack
+  title: "Hierarchical classification at multiple operating points"
+  type: inproceedings
+  year: 2022
+  booktitle: "Advances in Neural Information Processing Systems"
+  volume: 35
+  start: 18034
+  end: 18045
+  publisher: "Curran Associates, Inc."
+  url: "https://proceedings.neurips.cc/paper_files/paper/2022/file/727855c31df8821fd18d41c23daebf10-Paper-Conference.pdf"
+  editors:
+    - name: "S. Koyejo and S. Mohamed and A. Agarwal and D. Belgrave and K. Cho and A. Oh"

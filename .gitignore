@@ -1,0 +1,11 @@
+.vscode/
+/.venv/
+/.idea/
+/data/
+/train_data/
+/test_data/
+/new_data/
+/models/
+/build/
+src/**/__pycache__/
+src/*.egg-info/

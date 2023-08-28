@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "classia"
+description = "A toolkit for hierarchical classification"
+dynamic = ["version"]
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "AGPL-3.0-only"}
+keywords = ["classification", "hierarchical"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Affero General Public License version 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "numpy",
+    "torch",
+    "torchvision",
+    "torchtext",
+    "Pillow",
+    "tqdm",
+    "fsspec",
+    "gcsfs",
+    "matplotlib"
+]
+
+[project.scripts]
+classia = "classia.cli:run"
+
+[tool.setuptools.dynamic]
+version = {attr = "classia.__version__"}
+
+[tool.bandit]
+skips = ["B101"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203"
