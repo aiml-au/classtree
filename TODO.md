@@ -1,0 +1,15 @@
+- [x] Define CLI
+- [x] Define Images Model
+- [x] Define Text Model
+- [ ] Fill out CITATION.cff
+- [ ] Choose a demonstration dataset for images
+- [ ] Choose a demonstration dataset for text
+- [ ] Define the evaluation tool
+- [ ] Upload pre-trained weights
+- [ ] Define API for use as a library
+- [ ] Publish to PyPi
+- [ ] Move repository to GitHub
+- [ ] Set up a GitHub Actions pipeline to build and publish wheels
+- [ ] Build a live demo
+- [ ] Announce on social media
+- [ ] Add tools to export to other formats (e.g. ONNX)
