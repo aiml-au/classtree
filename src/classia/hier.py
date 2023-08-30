@@ -208,6 +208,20 @@ def make_hierarchy_from_edges(
     return Hierarchy(parents), names
 
 
+def load_edges(f: TextIO, delimiter=',') -> List[Tuple[str, str]]:
+    """Load from file containing (parent, node) pairs."""
+    import csv
+    reader = csv.reader(f)
+    pairs = []
+    for row in reader:
+        if not row:
+            continue
+        if len(row) != 2:
+            raise ValueError('invalid row', row)
+        pairs.append(tuple(row))
+    return pairs
+
+
 def format_tree(tree: Hierarchy, node_names: Optional[List[str]] = None, include_size: bool = False) -> str:
     if node_names is None:
         node_names = [str(i) for i in range(tree.num_nodes())]
