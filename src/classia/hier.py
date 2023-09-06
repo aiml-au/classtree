@@ -1,7 +1,7 @@
 import collections
 import itertools
 from functools import partial
-from typing import List, Tuple, Dict, Callable, Optional, Sequence
+from typing import List, Tuple, Dict, Callable, Optional, Sequence, TextIO
 
 import numpy as np
 import torch
@@ -191,9 +191,14 @@ def make_hierarchy_from_edges(
     # Set name of root from first pair.
     root, _ = pairs[0]
     names[0] = root
-    name_to_index[root] = 0
+    name_to_index[root] = 0 
+    # index_count = collections.defaultdict(int)
+
     for r, (u, v) in enumerate(pairs):
         if v in name_to_index:
+            # index_count[v] += 1 
+            # print('sub-category (V) already indexed in another higher level. Renaming V as V (cnt++)..')
+            # v = f'{v} ({index_count[v]})'
             raise ValueError('has multiple parents', v)
         i = name_to_index[u]
         j = r + 1

@@ -19,10 +19,10 @@ def run():
     subparsers = parser.add_subparsers(dest="command")
 
     train_parser = subparsers.add_parser("train", help="Train a new hierarchical classification model")
-    train_parser.add_argument("--model", help="The name of the model", required=True)
-    train_parser.add_argument("--epochs", help="The number of epochs to train for", default=10)
-    train_parser.add_argument("--batch_size", help="The batch size to use during training", default=8)
-    train_parser.add_argument("--lr", help="The learning rate to use during training", default=0.001)
+    train_parser.add_argument("--model", help="The name of the model", type=str, required=True)
+    train_parser.add_argument("--epochs", help="The number of epochs to train for", type=int, default=10)
+    train_parser.add_argument("--batch_size", help="The batch size to use during training", type=int, default=8)
+    train_parser.add_argument("--lr", help="The learning rate to use during training", type=float, default=0.001)
     train_datasource_group = train_parser.add_mutually_exclusive_group()
     train_datasource_group.add_argument("--images",
                                         help="The directory of training images, if training an image classifier")
@@ -62,6 +62,8 @@ def run():
             train_parser.error("One of --images or --docs must be provided.")
 
     elif args.command == "test":
+        # TODO: unpack error. Evaluation function not implemented yet.
+        # tree, label_set, files, labels = hierarchy_and_labels_from_folder(folder)
         if args.images:
             print(f"Test {args.model} on {args.images}")
             dirs, files = hierarchy_and_labels_from_folder(args.images)
