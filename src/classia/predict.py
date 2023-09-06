@@ -11,6 +11,8 @@ from .hier import make_hierarchy_from_edges, SumDescendants
 from .models import ClassiaImageModelV1, ClassiaTextModelV1
 
 
+MIN_THRESHOLD = 0.3
+
 def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'):
     with open(f"{models_dir}/{model_name}/labels.txt", "r") as f:
         lines = [line.strip() for line in f.readlines()]
@@ -74,7 +76,9 @@ def predict_docs(files, *, models_dir, model_name, batch_size=8, device='cuda'):
         edges = [line.split(",") for line in lines]
         tree, _ = make_hierarchy_from_edges([(labels[int(parent)], labels[int(child)]) for parent, child in edges])
 
+    is_leaf = tree.leaf_mask()
     specificity = -tree.num_leaf_descendants()
+    not_trivial = (tree.num_children() != 1)
 
     state = torch.load(f"{models_dir}/{model_name}/latest.pth")
     model = ClassiaTextModelV1(tree)
@@ -96,15 +100,16 @@ def predict_docs(files, *, models_dir, model_name, batch_size=8, device='cuda'):
             x = torch.tensor(transform(texts))
             x = x.to(device)
             theta = model(x)
-            prob = SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1).cpu()
+            prob = SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1).cpu().numpy()
 
             pred_idxs = [
-                pareto_optimal_predictions(specificity, p, None, None)
+                pareto_optimal_predictions(specificity, p, MIN_THRESHOLD, not_trivial)
                 for p in prob
             ]
+
             pred_paths = [
-                "/".join(labels[i] for i in np.nonzero(seq)[0])
-                for seq in pred_idxs
+                "/".join(labels[i] for i in seq if i!=0) # exclude root (0)
+                for seq in pred_idxs 
             ]
 
             for path in pred_paths:
