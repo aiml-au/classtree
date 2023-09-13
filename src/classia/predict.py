@@ -4,31 +4,28 @@ import numpy as np
 import torch
 from PIL import Image
 from torch.nn.functional import softmax
-from torchtext.models import ROBERTA_BASE_ENCODER
 from torchvision.transforms.v2 import CenterCrop, ToImageTensor, ConvertImageDtype, Normalize, Compose
 
-from .hier import make_hierarchy_from_edges, SumDescendants
-from .models import ClassiaImageModelV1, ClassiaTextModelV1
+from .hier import SumDescendants
+from .models import get_image_model, get_text_model, get_text_encoder
 
+MIN_THRESHOLD = 0.5
 
-MIN_THRESHOLD = 0.3
 
 def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'):
-    with open(f"{models_dir}/{model_name}/labels.txt", "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        labels = lines
-    with open(f"{models_dir}/{model_name}/tree.csv", "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        edges = [line.split(",") for line in lines]
-        tree, _ = make_hierarchy_from_edges([(labels[int(parent)], labels[int(child)]) for parent, child in edges])
 
-    specificity = -tree.num_leaf_descendants()
+    checkpoint = torch.load(f"{models_dir}/{model_name}/best.pth")
+    labels = checkpoint['labels']
+    tree = checkpoint['tree']
 
-    state = torch.load(f"{models_dir}/{model_name}/latest.pth")
-    model = ClassiaImageModelV1(tree)
-    model.load_state_dict(state)
+    image_model_size = checkpoint['model_size']
+    model= get_image_model(tree, image_model_size)
+    model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()
+
+    specificity = -tree.num_leaf_descendants()
+    not_trivial = (tree.num_children() != 1)
 
     transform = Compose([
         CenterCrop(224),
@@ -52,15 +49,16 @@ def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'
             x = torch.stack(images)
             x = x.to(device)
             theta = model(x)
-            prob = SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1).cpu()
+            prob = SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1).cpu().numpy()
 
             pred_idxs = [
-                pareto_optimal_predictions(specificity, p, None, None)
+                pareto_optimal_predictions(specificity, p, MIN_THRESHOLD, not_trivial)
                 for p in prob
             ]
+
             pred_paths = [
-                "/".join(labels[i] for i in np.nonzero(seq)[0])
-                for seq in pred_idxs
+                "/".join(labels[i] for i in seq if i!=0) # exclude root (0)
+                for seq in pred_idxs 
             ]
 
             for path in pred_paths:
@@ -68,25 +66,24 @@ def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'
 
 
 def predict_docs(files, *, models_dir, model_name, batch_size=8, device='cuda'):
-    with open(f"{models_dir}/{model_name}/labels.txt", "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        labels = lines
-    with open(f"{models_dir}/{model_name}/tree.csv", "r") as f:
-        lines = [line.strip() for line in f.readlines()]
-        edges = [line.split(",") for line in lines]
-        tree, _ = make_hierarchy_from_edges([(labels[int(parent)], labels[int(child)]) for parent, child in edges])
 
-    is_leaf = tree.leaf_mask()
-    specificity = -tree.num_leaf_descendants()
-    not_trivial = (tree.num_children() != 1)
+    checkpoint = torch.load(f"{models_dir}/{model_name}/best.pth") 
+    labels = checkpoint['labels']
+    tree = checkpoint['tree']
 
-    state = torch.load(f"{models_dir}/{model_name}/latest.pth")
-    model = ClassiaTextModelV1(tree)
-    model.load_state_dict(state)
+    text_model_size = checkpoint['model_size']
+    model= get_text_model(tree, text_model_size)
+    text_encoder= get_text_encoder(text_model_size)
+    model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()
 
-    transform = ROBERTA_BASE_ENCODER.transform()
+    specificity = -tree.num_leaf_descendants()
+    not_trivial = (tree.num_children() != 1)
+
+    transform = text_encoder.transform()
+    padding_idx = 1 # for texts-embeddings for all instances to be in the same dimension
+    import torchtext.functional as F
 
     with torch.no_grad():
 
@@ -97,7 +94,7 @@ def predict_docs(files, *, models_dir, model_name, batch_size=8, device='cuda'):
                     text = f.read()
                     texts.append(text)
 
-            x = torch.tensor(transform(texts))
+            x = F.to_tensor(transform(texts), padding_value=padding_idx)
             x = x.to(device)
             theta = model(x)
             prob = SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1).cpu().numpy()
@@ -163,7 +160,7 @@ def pareto_optimal_predictions(
     return valid_inds[order[keep]]
 
 
-# Not being used now
+# Used in validation metrics
 def argmax_with_confidence(
         value: np.ndarray,
         p: np.ndarray,
@@ -176,7 +173,6 @@ def argmax_with_confidence(
     return arglexmin_where(np.broadcast_arrays(-p, -value), mask)
 
 
-# Not being used now
 from typing import Optional, Tuple
 def arglexmin_where(
         keys: Tuple[np.ndarray, ...],
@@ -198,19 +194,4 @@ def arglexmin_where(
     result = np.take_along_axis(order, first_valid, axis=axis)
     if not keepdims:
         result = np.squeeze(result, axis=axis)
-    return result
-
-
-# Not being used now
-def argmax_where(
-        value: np.ndarray,
-        condition: np.ndarray,
-        axis: int = -1,
-        keepdims: bool = False) -> np.ndarray:
-    # Will raise an exception if not np.all(np.any(condition, axis=axis)).
-    # return np.nanargmax(np.where(condition, value, np.nan), axis=axis, keepdims=keepdims)
-    # nanargmax() only has keepdims for numpy>=1.22
-    result = np.nanargmax(np.where(condition, value, np.nan), axis=axis)
-    if keepdims:
-        result = np.expand_dims(result, axis)
     return result

@@ -21,7 +21,8 @@ dependencies = [
     "torchvision",
     "torchtext",
     "Pillow",
-    "tqdm"
+    "tqdm",
+    "fs-gcsfs"
 ]
 
 [project.scripts]

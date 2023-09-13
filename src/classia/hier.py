@@ -184,8 +184,10 @@ def make_hierarchy_from_edges(
     """
     num_edges = len(pairs)
     num_nodes = num_edges + 1
+    
     # Data structures to populate from list of pairs.
     parents = np.full([num_nodes], -1, dtype=int)
+
     names = [""] * num_nodes
     name_to_index = {}
     # Set name of root from first pair.
@@ -221,6 +223,31 @@ def load_edges(f: TextIO, delimiter=',') -> List[Tuple[str, str]]:
         pairs.append(tuple(row))
     return pairs
 
+def rooted_subtree(tree: Hierarchy, nodes: np.ndarray) -> Hierarchy:
+    """Finds the subtree that contains a subset of nodes."""
+    # Check that root is present in subset.
+    assert nodes[0] == 0
+    # Construct a new list of parents.
+    reindex = np.full([tree.num_nodes()], -1)
+    reindex[nodes] = np.arange(len(nodes))
+    parents = tree.parents()
+    subtree_parents = np.where(parents[nodes] >= 0, reindex[parents[nodes]], -1)
+    assert np.all(subtree_parents[1:] >= 0), 'parent not in subset'
+    # Ensure that parent appears before child.
+    assert np.all(subtree_parents < np.arange(len(nodes)))
+    return Hierarchy(subtree_parents)
+
+
+def rooted_subtree_spanning(tree: Hierarchy, nodes: np.ndarray) -> Tuple[Hierarchy, np.ndarray]:
+    nodes = ancestors_union(tree, nodes)
+    subtree = rooted_subtree(tree, nodes)
+    return subtree, nodes
+
+def ancestors_union(tree: Hierarchy, node_subset: np.ndarray) -> np.ndarray:
+    """Returns union of ancestors of nodes."""
+    paths = tree.paths_padded(-1)
+    paths = paths[node_subset]
+    return np.unique(paths[paths >= 0])
 
 def format_tree(tree: Hierarchy, node_names: Optional[List[str]] = None, include_size: bool = False) -> str:
     if node_names is None:
@@ -266,6 +293,12 @@ class FindLCA:
             axis=-1)
         return paths[inds_a, num_common - 1]
 
+# Used in validation
+def truncate_given_lca(gt: np.ndarray, pr: np.ndarray, lca: np.ndarray) -> np.ndarray:
+    """Truncates the prediction if a descendant of the ground-truth."""
+    return np.where(gt == lca, gt, pr)
+
+
 def find_projection(
         tree: Hierarchy,
         node_subset: np.ndarray) -> np.ndarray:
@@ -291,6 +324,14 @@ def _last_nonzero(x, axis):
     # (First element that is true in reversed array.)
     n = x.shape[axis]
     return (n - 1) - np.argmax(np.flip(x, axis), axis=axis)
+
+def uniform_leaf(tree: Hierarchy) -> np.ndarray:
+    """Returns a uniform distribution over leaf nodes."""
+    is_ancestor = tree.ancestor_mask(strict=False)
+    is_leaf = tree.leaf_mask()
+    num_leaf_descendants = is_ancestor[:, is_leaf].sum(axis=1)
+    return num_leaf_descendants / is_leaf.sum()
+
 
 class Sum(Module):
     """Implements sum_xxx as an object. Avoids re-computation."""
