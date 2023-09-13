@@ -12,7 +12,7 @@ from fs import open_fs
 logging.basicConfig(level=logging.INFO)
 LOGGER = logging.getLogger(__name__)
 
-REMOTE_FS_URL = os.getenv("REMOTE_FS", default="gs://aiml-shop-classia-public") # /models
+REMOTE_FS_URL = os.getenv("REMOTE_FS", default="gs://aiml-shop-classia-public") 
 
 def run():
     global REMOTE_FS_URL

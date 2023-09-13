@@ -102,7 +102,7 @@ def prepare_dataloaders(model_type, dataset, batch_size=8, model_size='base'):
 
 # Save training/validationloss plots
 def save_training_plot(train_loss, val_loss, save_dir):
-    print('Saving loss plots...')
+    LOGGER.info('Saving loss plots...')
 
     plt.figure(figsize=(10, 7))
     plt.plot(train_loss, color='orange', label='train loss')
@@ -280,7 +280,7 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
             training_logs['best']['train_loss'] = mean_train_loss
             training_logs['best']['best_metric'] = best_metric
 
-            print(f'Saving best model at Epoch {best_epoch} | val_loss: {best_loss}')
+            LOGGER.info(f'Saving best model at Epoch {best_epoch} | val_loss: {best_loss}')
             torch.save(curent_state, f'{models_dir}/{model_name}/best.pth')
         
         training_logs['logs']['epoch'] = epoch 
@@ -289,7 +289,7 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
 
         # Early stopping        
         if best_epoch <= epoch - PATIENCE: # nothing is improving for a while 
-            print(f"Early stopping.. at Epoch {epoch} with patience of {PATIENCE} epochs") 
+            LOGGER.info(f"Early stopping.. at Epoch {epoch} with patience of {PATIENCE} epochs") 
             break 
         
     LOGGER.info('TRAINING COMPLETE')
