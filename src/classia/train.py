@@ -144,7 +144,7 @@ def get_label_map(tree):
     
     return label_map
 
-def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, model_name, model_size, epochs=50, lr=0.001, resume=False, device='cuda'):
+def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, model_name, model_type, model_size, epochs=50, lr=0.001, resume=False, device='cuda'):
 
     specificity = -tree.num_leaf_descendants()
     not_trivial = (tree.num_children() != 1)
@@ -168,7 +168,8 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         model_dict = {'epoch': epoch,
                     'labels':label_set,
                     'tree': tree, 
-                    'model_size': model_size,                     
+                    'model_type': model_type,  
+                    'model_size': model_size,                   
                     'model_weight_name': model._get_name(),                     
                     'model_state_dict': state
         }
@@ -300,15 +301,8 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         json.dump(training_logs, f, indent=4)
 
 
-def evaluate(model, eval_loader, tree, models_dir, model_name, device='cuda'):
+def evaluate(model, eval_loader, tree, device='cuda'):
 
-    if os.path.exists(f'{models_dir}/{model_name}/best.pth'):
-        checkpoint = torch.load(f'{models_dir}/{model_name}/best.pth')
-        model.load_state_dict(checkpoint['model_state_dict'])
-    else:
-        LOGGER.warning('Saved best model does not exist in this directory.')
-        return
-    
     model.to(device)
 
     specificity = -tree.num_leaf_descendants()

@@ -6,6 +6,8 @@ from torchvision.models.resnet import ResNet18_Weights, ResNet50_Weights, ResNet
 from torchtext.models.roberta.bundler import ROBERTA_BASE_ENCODER, ROBERTA_LARGE_ENCODER
 
 from .hier import Hierarchy
+import logging
+LOGGER = logging.getLogger(__name__)
 
 # Image model: Small, Medium, Large
 # ref: https://pytorch.org/vision/master/_modules/torchvision/models/resnet.html

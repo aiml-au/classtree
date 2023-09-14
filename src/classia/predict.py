@@ -7,19 +7,20 @@ from torch.nn.functional import softmax
 from torchvision.transforms.v2 import CenterCrop, ToImageTensor, ConvertImageDtype, Normalize, Compose
 
 from .hier import SumDescendants
-from .models import get_image_model, get_text_model, get_text_encoder
+from .models import *
 
 MIN_THRESHOLD = 0.5
 
 
-def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'):
+def predict_images(files, checkpoint, *, batch_size=8, device='cuda'):
 
-    checkpoint = torch.load(f"{models_dir}/{model_name}/best.pth")
     labels = checkpoint['labels']
     tree = checkpoint['tree']
 
-    image_model_size = checkpoint['model_size']
-    model= get_image_model(tree, image_model_size)
+    model_name = checkpoint['model_weight_name']
+    model = eval(model_name)
+    model = model(tree)
+
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()
@@ -65,15 +66,15 @@ def predict_images(files, *, models_dir, model_name, batch_size=8, device='cuda'
                 print(path)
 
 
-def predict_docs(files, *, models_dir, model_name, batch_size=8, device='cuda'):
+def predict_docs(files, checkpoint, *, batch_size=8, device='cuda'):
 
-    checkpoint = torch.load(f"{models_dir}/{model_name}/best.pth") 
     labels = checkpoint['labels']
     tree = checkpoint['tree']
 
     text_model_size = checkpoint['model_size']
     model= get_text_model(tree, text_model_size)
     text_encoder= get_text_encoder(text_model_size)
+
     model.load_state_dict(checkpoint['model_state_dict'])
     model.to(device)
     model.eval()

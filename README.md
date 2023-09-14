@@ -62,6 +62,15 @@ classia predict --model=inat21-mini new_data/*.jpg
 classia test --model animals --images=test_data/animals
 ```
 
+## Download
+
+```shell
+classia download --model=dbpedia --download_dir train_data
+classia download --dataset=inaturalist21-mini.zip --download_dir train_data
+```
+`--download_dir` is an optional argument. If not passed, data will be downloaded into your user cache directory.
+In above example, data will be saved in `train_data/dbpedia/best.pth` and `train_data//naturalist21-mini.zip` respectively.
+
 ## Licensing
 
 Classia is provided under AGPLv3, or via a [commercial license](https://shop.aiml.team/products/classia). 
