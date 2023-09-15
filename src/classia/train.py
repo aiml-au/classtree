@@ -341,7 +341,7 @@ def evaluate(model, eval_loader, tree, device='cuda'):
                                     for field in metric_totals}         
         LOGGER.info('[Evaluation Metric]:')
         for metric, values in metric_means.items(): 
-            LOGGER.info(f'\t{metric}: {"{:.2f}%".format(values)}')
+            LOGGER.info(f'\t{metric}: {"{:.2f}".format(values)}')
 
         return metric_means
     
