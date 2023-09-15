@@ -279,6 +279,24 @@ def format_tree(tree: Hierarchy, node_names: Optional[List[str]] = None, include
 
     return ''.join(subtree(0, '', ''))
 
+
+def find_lca(tree: Hierarchy, inds_a: np.ndarray, inds_b: np.ndarray) -> np.ndarray:
+    """Returns the index of the LCA node.
+
+    Supports multi-dimensional index arrays.
+    For example, to obtain an exhaustive table:
+        n = tree.num_nodes()
+        find_lca(tree, np.arange(n)[:, np.newaxis], np.arange(n)[np.newaxis, :])
+    """
+    paths = tree.paths_padded(exclude_root=False)
+    paths_a = paths[inds_a]
+    paths_b = paths[inds_b]
+    num_common = np.count_nonzero(
+        ((paths_a == paths_b) & (paths_a >= 0) & (paths_b >= 0)),
+        axis=-1)
+    return paths[inds_a, num_common - 1]
+
+
 class FindLCA:
 
     def __init__(self, tree: Hierarchy):
@@ -292,6 +310,7 @@ class FindLCA:
             ((paths_a == paths_b) & (paths_a >= 0) & (paths_b >= 0)),
             axis=-1)
         return paths[inds_a, num_common - 1]
+
 
 # Used in validation
 def truncate_given_lca(gt: np.ndarray, pr: np.ndarray, lca: np.ndarray) -> np.ndarray:

@@ -18,8 +18,8 @@ from tqdm import tqdm
 from .hier import truncate_given_lca, FindLCA, SumDescendants
 from .dataset import ClassiaImageDataset, ClassiaTextDataset
 from .loss import MarginLoss
-from .metrics import UniformLeafInfoMetric, DepthMetric, IsCorrect
-from .predict import pareto_optimal_predictions, argmax_with_confidence
+from .metrics import UniformLeafInfoMetric, DepthMetric, IsCorrect, operating_curve
+from .predict import pareto_optimal_predictions
 
 LOGGER = logging.getLogger(__name__)
 
@@ -146,9 +146,6 @@ def get_label_map(tree):
 
 def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, model_name, model_type, model_size, epochs=50, lr=0.001, resume=False, device='cuda'):
 
-    specificity = -tree.num_leaf_descendants()
-    not_trivial = (tree.num_children() != 1)
-
     train_label_map = eval_label_map = get_label_map(tree)
 
     model.to(device)
@@ -158,7 +155,6 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
 
     best_loss = float('inf') 
     best_epoch = 0
-    best_metric = None
     train_loss_history, eval_loss_history = [], []
 
     items_to_log = dict.fromkeys(['epoch', 'eval_loss', 'train_loss'])
@@ -175,8 +171,6 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         }
         return model_dict
     
-    metric_fns = get_metric_fns(tree)
-
     # Loading pretrained weights and resume from last epoch | condition: resume
     start_epoch = 0
     if resume:
@@ -214,11 +208,7 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         mean_train_loss = total_train_loss / len(train_loader)
         train_loss_history.append(mean_train_loss)
 
-        ######################    
-        # validate the model #
-        ######################
-        find_lca = FindLCA(tree)
-        metric_totals = {field: 0 for field in metric_fns}  
+        # Evalidate the model
         with torch.no_grad():
             model.eval() 
             total_eval_loss = 0.
@@ -233,22 +223,7 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
 
                 loss = loss_fn(theta, gt_targets.to(device))
                 eval_loss = loss.item()
-                total_eval_loss += eval_loss
-
-                # metric
-                def pred_fn(theta):
-                    return SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1)
-
-                prob = pred_fn(theta).cpu().numpy()
-                gt_node = eval_label_map.to_node[gt_labels]
-
-                pr = argmax_with_confidence(specificity, prob, MIN_THRESHOLD, not_trivial) # TODO: check and compare with pareto               
-                pred = truncate_given_lca(gt_node, pr, find_lca(gt_node, pr))
-                
-                for field in metric_fns:
-                    metric_fn = metric_fns[field]
-                    metric_value = metric_fn(gt_node, pred)
-                    metric_totals[field] += metric_value.sum()                    
+                total_eval_loss += eval_loss           
 
         mean_eval_loss = total_eval_loss / len(eval_loader)
         eval_loss_history.append(mean_eval_loss)        
@@ -260,26 +235,14 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         # Save latest model
         torch.save(curent_state, f'{models_dir}/{model_name}/latest.pth')
 
-        # Show and save metric only at best validation epoch
-        def show_metric():
-            metric_means = {field: metric_totals[field] / len(eval_loader)
-                                        for field in metric_totals}         
-            LOGGER.info('[Evaluation Metric]:')
-            for metric, values in metric_means.items(): 
-                LOGGER.info(f'\t{metric}: {"{:.2f}%".format(values)}')
-
-            return metric_means
-
         # Save best model at best evaluation loss 
         if mean_eval_loss < best_loss:
             best_loss = mean_eval_loss
             best_epoch = epoch
-            metric_means = show_metric() 
-            best_metric = metric_means
+
             training_logs['best']['epoch'] = best_epoch 
             training_logs['best']['eval_loss'] = mean_eval_loss
             training_logs['best']['train_loss'] = mean_train_loss
-            training_logs['best']['best_metric'] = best_metric
 
             LOGGER.info(f'Saving best model at Epoch {best_epoch} | val_loss: {best_loss}')
             torch.save(curent_state, f'{models_dir}/{model_name}/best.pth')
@@ -309,10 +272,10 @@ def evaluate(model, eval_loader, tree, device='cuda'):
     not_trivial = (tree.num_children() != 1)
 
     eval_label_map = get_label_map(tree)
-    metric_fns = get_metric_fns(tree)
 
-    find_lca = FindLCA(tree)
-    metric_totals = {field: 0 for field in metric_fns}  
+    gt = []
+    seq_outputs_prob, seq_outputs_pred = [], []
+
     with torch.no_grad():
         model.eval() 
 
@@ -320,29 +283,46 @@ def evaluate(model, eval_loader, tree, device='cuda'):
             inputs = inputs.to(device)
             theta = model(inputs)
 
-            # metric
             def pred_fn(theta):
                 return SumDescendants(tree, strict=False).to(device)(softmax(theta, dim=-1), dim=-1)
 
             prob = pred_fn(theta).cpu().numpy()
             gt_node = eval_label_map.to_node[gt_labels]
 
-            pr = argmax_with_confidence(specificity, prob, MIN_THRESHOLD, not_trivial) # TODO: check and compare with pareto               
-            pred = truncate_given_lca(gt_node, pr, find_lca(gt_node, pr))
+            pred_seqs = [
+                pareto_optimal_predictions(specificity, p, MIN_THRESHOLD, not_trivial)
+                for p in prob
+            ]
+            prob_seqs = [prob[i, pred_i] for i, pred_i in enumerate(pred_seqs)]
+
+            # Concatenate array results from minibatches.
+            gt.extend(gt_node)
+            seq_outputs_pred.extend(pred_seqs)
+            seq_outputs_prob.extend(prob_seqs)
             
-            for field in metric_fns:
-                metric_fn = metric_fns[field]
-                metric_value = metric_fn(gt_node, pred)
-                metric_totals[field] += metric_value.sum()                    
+    pareto_means = assess_predictions(tree, gt, seq_outputs_prob, seq_outputs_pred)
+     
+    LOGGER.info('[Evaluation Metric]:')
+    for metric, values in pareto_means.items(): 
+        metric_values_means = np.mean(values)
+        LOGGER.info(f'\t{metric}: {"{:.2f}".format(metric_values_means)}')
 
-    # Show and save metric only at best validation epoch
-    def show_metric():
-        metric_means = {field: metric_totals[field] / len(eval_loader)
-                                    for field in metric_totals}         
-        LOGGER.info('[Evaluation Metric]:')
-        for metric, values in metric_means.items(): 
-            LOGGER.info(f'\t{metric}: {"{:.2f}".format(values)}')
 
-        return metric_means
-    
-    _ = show_metric()
+# Show metrics: from eval_inat21mini.ipynb
+def assess_predictions(tree, gt, prob_seq, pred_seq):
+
+    metric_fns = get_metric_fns(tree)
+
+    # Evaluate predictions in Pareto sequence.
+    find_lca = FindLCA(tree)
+    pred_seq = [truncate_given_lca(gt_i, pr_i, find_lca(gt_i, pr_i)) for gt_i, pr_i in zip(gt, pred_seq)]
+    metric_values_seq = {
+        field: [metric_fn(gt_i, pr_i) for gt_i, pr_i in zip(gt, pred_seq)]
+        for field, metric_fn in metric_fns.items()
+    }
+
+    _, pareto_totals = operating_curve(prob_seq, metric_values_seq)
+
+    pareto_means = {k: v / len(gt) for k, v in pareto_totals.items()}
+
+    return pareto_means

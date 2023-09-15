@@ -1,3 +1,4 @@
+from typing import Dict, List, Tuple
 import numpy as np
 
 from .hier import Hierarchy, FindLCA, uniform_leaf
@@ -87,3 +88,46 @@ class IsCorrect:
         # # If this is the case, lca == gt or lca == pr.
         # return (depth_lca == depth_gt) | (depth_lca == depth_pr)
         return (lca == gt) | (lca == pr)
+
+
+def operating_curve(
+        example_scores: List[np.ndarray],
+        example_metrics: Dict[str, List[np.ndarray]],
+        ) -> Tuple[np.ndarray, Dict[str, np.ndarray]]:
+    """Obtains operating curve for set of metrics.
+
+    For each field in example_metrics, `example_scores[i]` and `example_metrics[field][i]`
+    are arrays of the same length, ordered descending by score.
+    This can be obtained using `infer.prediction_sequence()`.
+    """
+    # Assert that scores are sorted (descending) per example.
+    for seq in example_scores:
+        if not np.all(np.diff(seq) <= 0):
+            raise ValueError('scores must be strictly descending', seq)
+
+    # # Check that all scores have identical start.
+    # init_scores = np.array([seq[0] for seq in example_scores])
+    # unique_init_scores = np.unique(init_scores)
+    # if not len(unique_init_scores) == 1:
+    #     raise ValueError('initial scores are not equal', unique_init_scores)
+    # init_score, = unique_init_scores
+
+    # Obtain order of scores.
+    # Note: Could do a merge sort here, since each array is already sorted.
+    step_scores = np.concatenate([seq[1:] for seq in example_scores])
+    step_order = np.argsort(-step_scores)
+    step_scores = step_scores[step_order]
+    # Identify first element in each group of scores.
+    n = len(step_scores)
+    _, first_index = np.unique(-step_scores, return_index=True)
+    group_scores = step_scores[first_index]
+    # group_scores = np.concatenate(([init_score], step_scores[first_index]))
+    last_index = np.concatenate((first_index[1:], [n])) - 1
+    group_totals = {}
+    for field, example_values in example_metrics.items():
+        # Convert to float since np.diff() treats bools as mod 2 arithmetic.
+        example_values = [seq.astype(float) for seq in example_values]
+        total_init = np.sum([seq[0] for seq in example_values])
+        total_deltas = np.concatenate([np.diff(seq) for seq in example_values])[step_order]
+        group_totals[field] = np.concatenate(([total_init], total_init + np.cumsum(total_deltas)[last_index]))
+    return group_scores, group_totals
