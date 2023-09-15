@@ -106,21 +106,30 @@ def run():
             checkpoint = torch.load(f'{args.models_dir}/{args.model}/best.pth')
             model_name = checkpoint['model_weight_name']
             model_size = checkpoint['model_size']
+            model_type = checkpoint['model_type']
             tree = checkpoint['tree']
             model = eval(model_name)
             model = model(tree)
             model.load_state_dict(checkpoint['model_state_dict'])
         else:
             LOGGER.warning('Saved best model does not exist in this directory.')
+            return
         
+
         if args.images:
-            LOGGER.info(f"Test {args.model} on {args.images}")
-            model_type = 'image'
+            if model_type == 'text':
+                LOGGER.info(f"Pretrained model type is {model_type} but arg --images was passed. Pass --docs with this model type.")
+                return
+
+            LOGGER.info(f"Test {args.model} on {args.images}")            
             tree, _, files, labels = hierarchy_and_labels_from_folder(args.images)
 
         elif args.docs:
+            if model_type == 'image':
+                LOGGER.info(f"Pretrained model type is {model_type} but arg --docs was passed. Pass --images with this model type.")
+                return
+    
             LOGGER.info(f"Test {args.model} on {args.docs}")
-            model_type = 'text'
             tree, _, files, labels = hierarchy_and_labels_from_folder(args.docs)
 
         else:
