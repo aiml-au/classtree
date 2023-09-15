@@ -90,6 +90,14 @@ Note: `Name` in above table is the name of `--dataset` (with or without extensio
 classia test --model animals --images=test_data/animals
 ```
 
+Some key arguments:
+```shell
+--model (str, Required): The name of the model or task you want to name. (e.g., animal, wiki)
+--docs (str): The directory of documents to evaluate for text classifier
+--images (str): The directory of images to evaluate for image classifier
+--batch_size (int, Optional, default=8): The batch size to use during evaluation
+```
+
 ## 4) Test unseen data
 ```shell
 classia predict --model=inat21-mini new_data/*.jpg
