@@ -100,13 +100,13 @@ def prepare_dataloaders(model_type, dataset, batch_size=8, model_size='base'):
     return train_loader, eval_loader
 
 
-# Save training/validationloss plots
+# Save training/validation loss plots
 def save_training_plot(train_loss, val_loss, save_dir):
     LOGGER.info('Saving loss plots...')
 
     plt.figure(figsize=(10, 7))
     plt.plot(train_loss, color='orange', label='train loss')
-    plt.plot(val_loss, color='red', label='validataion loss')
+    plt.plot(val_loss, color='red', label='validation loss')
     plt.xlabel('Epochs')
     plt.ylabel('Loss')
     plt.legend()
@@ -207,7 +207,7 @@ def train_model(model, train_loader, eval_loader, tree, label_set, models_dir, m
         mean_train_loss = total_train_loss / len(train_loader)
         train_loss_history.append(mean_train_loss)
 
-        # Evalidate the model
+        # Validate the model
         with torch.no_grad():
             model.eval() 
             total_eval_loss = 0.
