@@ -16,7 +16,7 @@ class ClassiaImageModelSmall(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
-        self.resnet = resnet18(weights=ResNet18_Weights.DEFAULT) # 183250
+        self.resnet = resnet18(weights=ResNet18_Weights.DEFAULT) 
         hidden_units = self.resnet.fc.in_features
         self.resnet.fc = Linear(hidden_units, tree.num_nodes())
 
@@ -28,7 +28,7 @@ class ClassiaImageModelMedium(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
-        self.resnet = resnet50(weights=ResNet50_Weights.DEFAULT) # 183250
+        self.resnet = resnet50(weights=ResNet50_Weights.DEFAULT) 
         hidden_units = self.resnet.fc.in_features
         self.resnet.fc = Linear(hidden_units, tree.num_nodes())
 
@@ -40,7 +40,7 @@ class ClassiaImageModelLarge(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
-        self.resnet = resnet101(weights=ResNet101_Weights.DEFAULT) # 183250
+        self.resnet = resnet101(weights=ResNet101_Weights.DEFAULT) 
         hidden_units = self.resnet.fc.in_features
         self.resnet.fc = Linear(hidden_units, tree.num_nodes())
 

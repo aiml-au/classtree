@@ -23,7 +23,7 @@ from .predict import pareto_optimal_predictions
 
 LOGGER = logging.getLogger(__name__)
 
-PATIENCE = 5 # 10
+PATIENCE = 10
 SPLIT_RATIO = 0.8
 MIN_THRESHOLD = 0.5
 
