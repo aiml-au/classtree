@@ -22,7 +22,8 @@ dependencies = [
     "torchtext",
     "Pillow",
     "tqdm",
-    "fs-gcsfs"
+    "fs-gcsfs",
+    "matplotlib"
 ]
 
 [project.scripts]
