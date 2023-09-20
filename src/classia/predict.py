@@ -1,13 +1,14 @@
-from typing import Optional
+from typing import Optional, Tuple
 
 import numpy as np
 import torch
 from PIL import Image
 from torch.nn.functional import softmax
 from torchvision.transforms.v2 import CenterCrop, ToImageTensor, ConvertImageDtype, Normalize, Compose
+import torchtext.functional as F
 
 from .hier import SumDescendants
-from .models import *
+from .models import get_text_model, get_text_encoder, ClassiaImageModelSmall, ClassiaImageModelMedium, ClassiaImageModelLarge
 
 MIN_THRESHOLD = 0.5
 
@@ -84,7 +85,6 @@ def predict_docs(files, checkpoint, *, batch_size=8, device='cuda'):
 
     transform = text_encoder.transform()
     padding_idx = 1 # for texts-embeddings for all instances to be in the same dimension
-    import torchtext.functional as F
 
     with torch.no_grad():
 
@@ -174,7 +174,6 @@ def argmax_with_confidence(
     return arglexmin_where(np.broadcast_arrays(-p, -value), mask)
 
 
-from typing import Optional, Tuple
 def arglexmin_where(
         keys: Tuple[np.ndarray, ...],
         condition: np.ndarray,
