@@ -111,7 +111,6 @@ def save_training_plot(train_loss, val_loss, save_dir):
     plt.ylabel('Loss')
     plt.legend()
     plt.savefig(f"{save_dir}/loss_plot.png")
-    plt.show()
 
 
 LabelMap = collections.namedtuple('LabelMap', ['to_node', 'to_target'])
