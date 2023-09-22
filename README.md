@@ -16,7 +16,7 @@ train_data/
     |- mammals/
        |- marsupials/
           |- koala/
-             |- image001.jpg 
+             |- image001.jpg
              |- image002.jpg
              |- ...
           |- ...
@@ -27,13 +27,13 @@ train_data/
 ```
 
 ```shell
-classia train --model animals --images=train_data/animals
+classia train images --model animals --dir train_data/animals
 ```
 
 or
 
 ```shell
-classia train --model animals --docs=train_data/animals
+classia train text --model animals --dir train_data/animals
 ```
 
 And then use your model with the predict command.
@@ -48,20 +48,45 @@ classia predict --model animals new_data/image304.jpg
 You can download a pre-trained model using the download command.
 
 ```shell
-classia download --model=inat21-mini
-classia predict --model=inat21-mini new_data/*.jpg
+classia download model dbpedia
 ```
 
-| Name        | Dataset                                                                            | Labels | Notes |
-|-------------|------------------------------------------------------------------------------------|--------|-------|
-| inat21-mini | [iNaturalist 2021 (Mini)](https://github.com/visipedia/inat_comp/tree/master/2021) |        | Non-commercial research/educational use |
+Or download a pre-prepared dataset.
+
+```shell
+classia download images inaturalist21-mini
+classia download text dbpedia
+```
+
+If you want to fine-tune an existing model, you can use the `--from` flag during training with any downloaded model.
+
+```shell
+classia train text --model animals --from dbpedia --dir train_data/animals
+```
+
+
+### Available Models
+
+| Task                 | Name               | Size | Dataset                | Notes                                        |
+|----------------------|--------------------|------|------------------------|----------------------------------------------|
+| Image Classification | inaturalist21-mini | M    | inaturalist21-mini     | Non-commercial research/educational use only |
+| Text Classification  | dbpedia            | M    | dbpedia                |                                              |
+
+### Available Datasets
+
+| Type  | Name               | Dataset                                                                            | Notes                                        |
+|-------|--------------------|------------------------------------------------------------------------------------|----------------------------------------------|
+| Image | inaturalist21-mini | [iNaturalist 2021 (Mini)](https://github.com/visipedia/inat_comp/tree/master/2021) | Non-commercial research/educational use only |
+| Text  | dbpedia            | [DBPedia](https://www.kaggle.com/datasets/danofer/dbpedia-classes)                 | CC0: Public Domain                           |
 
 ## Evaluation
 
+You can test your model on a hold-out dataset using the `test` command.
+
 ```shell
-classia test --model animals --images=test_data/animals
+classia test --model animals --dir=test_data/animals
 ```
 
 ## Licensing
 
-Classia is provided under AGPLv3, or via a [commercial license](https://shop.aiml.team/products/classia). 
+Classia is provided under AGPLv3, or via a [commercial license](https://shop.aiml.team/products/classia).
