@@ -1,5 +1,4 @@
 ### Documentation
-- [ ] Fill out CITATION.cff
 - [ ] Review LICENSE
 - [ ] Pydocs
 - [ ] Getting Started Guide
