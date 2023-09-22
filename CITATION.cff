@@ -1,8 +1,11 @@
-cff-version: 1.2.0
-message: "If you use this software, please cite it as below."
-authors:
-  - family-names: Valmadre
-    given-names: Jack
-title: "Hierarchical classification at multiple operating points"
-doi: 10.5281/zenodo.1234
-date-released: 2021-08-11
+@inproceedings{NEURIPS2022_727855c3,
+ author = {Valmadre, Jack},
+ booktitle = {Advances in Neural Information Processing Systems},
+ editor = {S. Koyejo and S. Mohamed and A. Agarwal and D. Belgrave and K. Cho and A. Oh},
+ pages = {18034--18045},
+ publisher = {Curran Associates, Inc.},
+ title = {Hierarchical classification at multiple operating points},
+ url = {https://proceedings.neurips.cc/paper_files/paper/2022/file/727855c31df8821fd18d41c23daebf10-Paper-Conference.pdf},
+ volume = {35},
+ year = {2022}
+}

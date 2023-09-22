@@ -2,7 +2,6 @@ import os
 from pathlib import Path
 
 import torch
-from torch.nn.functional import pad
 from torch.utils.data import Dataset
 
 from PIL import Image
@@ -21,7 +20,7 @@ class ClassiaImageDataset(Dataset):
 
     def __getitem__(self, i):
         with Image.open(self.files[i]) as image:
-            image = image.convert('RGB')
+            image = image.convert("RGB")
             image = self.transform(image)
 
             return image, self.labels[i]
@@ -37,7 +36,7 @@ class ClassiaTextDataset(Dataset):
         return len(self.files)
 
     def __getitem__(self, i):
-        with open(self.files[i], 'r') as f:
+        with open(self.files[i], "r") as f:
             text = f.read()
             input_ids = torch.tensor(self.transform(text), dtype=torch.long)
             attention_mask = torch.ones_like(input_ids)
@@ -46,7 +45,6 @@ class ClassiaTextDataset(Dataset):
 
 
 def hierarchy_and_labels_from_folder(folder):
-
     folder = Path(folder).expanduser()
 
     file_list = []
@@ -55,7 +53,8 @@ def hierarchy_and_labels_from_folder(folder):
     edge_list = []
 
     for root, dirs, files in os.walk(folder):
-        # HACK: os.walk doesn't guarantee order, so we mutate the dirs list that will be used internally to enforce an order
+        # HACK: os.walk doesn't guarantee order, so we mutate
+        # the dirs list that will be used internally to enforce an order
         dirs.sort()
         files.sort()
         for file in files:
@@ -75,4 +74,9 @@ def hierarchy_and_labels_from_folder(folder):
     tree, node_labels = make_hierarchy_from_edges(edge_list)
     label_indices = {label: i for i, label in enumerate(node_labels)}
 
-    return tree, node_labels, file_list, [label_indices[label_parts[-1]] for label_parts in labels_list]
+    return (
+        tree,
+        node_labels,
+        file_list,
+        [label_indices[label_parts[-1]] for label_parts in labels_list],
+    )

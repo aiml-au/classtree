@@ -21,7 +21,10 @@ dependencies = [
     "torchvision",
     "torchtext",
     "Pillow",
-    "tqdm"
+    "tqdm",
+    "fsspec",
+    "gcsfs",
+    "matplotlib"
 ]
 
 [project.scripts]
@@ -29,3 +32,10 @@ classia = "classia.cli:run"
 
 [tool.setuptools.dynamic]
 version = {attr = "classia.__version__"}
+
+[tool.bandit]
+skips = ["B101"]
+
+[tool.flake8]
+max-line-length = 88
+extend-ignore = "E203"
