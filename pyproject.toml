@@ -8,7 +8,7 @@ description = "A toolkit for hierarchical classification"
 dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "AGPL-3.0-only"}
+license = {file = "LICENSE.txt"}
 keywords = ["classification", "hierarchical"]
 classifiers = [
     "Programming Language :: Python :: 3",
