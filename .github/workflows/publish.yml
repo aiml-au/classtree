@@ -71,7 +71,14 @@ jobs:
       - name: Download all wheels
         uses: actions/download-artifact@v2
         with:
-          path: dist
+          path: wheels
+
+      - name: Build dist directory
+        run: |
+          mkdir -p dist
+          mv wheels/*/*.whl dist/
+          rm -rf wheels
+          ls dist/
 
       - name: Install dependencies
         run: |
