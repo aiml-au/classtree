@@ -12,7 +12,6 @@ license = {file = "LICENSE.txt"}
 keywords = ["classification", "hierarchical"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Affero General Public License version 3",
     "Operating System :: OS Independent",
 ]
 dependencies = [
