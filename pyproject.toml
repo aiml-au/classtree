@@ -27,10 +27,10 @@ dependencies = [
 ]
 
 [project.scripts]
-classia = "classia.cli:run"
+classtree = "classtree.cli:run"
 
 [tool.setuptools.dynamic]
-version = {attr = "classia.__version__"}
+version = {attr = "classtree.__version__"}
 
 [tool.bandit]
 skips = ["B101"]
