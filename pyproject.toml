@@ -3,7 +3,7 @@ requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "classia"
+name = "classtree"
 description = "A toolkit for hierarchical classification"
 dynamic = ["version"]
 readme = "README.md"

@@ -9,7 +9,7 @@ from PIL import Image
 from .hier import make_hierarchy_from_edges
 
 
-class ClassiaImageDataset(Dataset):
+class ClasstreeImageDataset(Dataset):
     def __init__(self, files, labels, transform):
         self.files = files
         self.labels = labels
@@ -26,7 +26,7 @@ class ClassiaImageDataset(Dataset):
             return image, self.labels[i]
 
 
-class ClassiaTextDataset(Dataset):
+class ClasstreeTextDataset(Dataset):
     def __init__(self, files, labels, *, transform):
         self.files = files
         self.labels = labels

@@ -16,7 +16,7 @@ LOGGER = logging.getLogger(__name__)
 
 # Image model: Small, Medium, Large
 # ref: https://pytorch.org/vision/master/_modules/torchvision/models/resnet.html
-class ClassiaImageModelV1Small(Module):
+class ClasstreeImageModelV1Small(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
@@ -28,7 +28,7 @@ class ClassiaImageModelV1Small(Module):
         return self.resnet(x)
 
 
-class ClassiaImageModelV1Medium(Module):
+class ClasstreeImageModelV1Medium(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
@@ -40,7 +40,7 @@ class ClassiaImageModelV1Medium(Module):
         return self.resnet(x)
 
 
-class ClassiaImageModelV1Large(Module):
+class ClasstreeImageModelV1Large(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
@@ -54,7 +54,7 @@ class ClassiaImageModelV1Large(Module):
 
 # TEXT MODEL: Base, Large
 # ref: https://pytorch.org/text/stable/_modules/torchtext/models/roberta/bundler.html
-class ClassiaTextModelV1Medium(Module):
+class ClasstreeTextModelV1Medium(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
@@ -69,7 +69,7 @@ class ClassiaTextModelV1Medium(Module):
         return self.roberta(input_ids)
 
 
-class ClassiaTextModelV1Large(Module):
+class ClasstreeTextModelV1Large(Module):
     def __init__(self, tree: Hierarchy):
         super().__init__()
 
@@ -85,11 +85,11 @@ class ClassiaTextModelV1Large(Module):
 
 
 model_classes = {
-    "image-v1-s": ClassiaImageModelV1Small,
-    "image-v1-m": ClassiaImageModelV1Medium,
-    "image-v1-l": ClassiaImageModelV1Large,
-    "text-v1-m": ClassiaTextModelV1Medium,
-    "text-v1-l": ClassiaTextModelV1Large,
+    "image-v1-s": ClasstreeImageModelV1Small,
+    "image-v1-m": ClasstreeImageModelV1Medium,
+    "image-v1-l": ClasstreeImageModelV1Large,
+    "text-v1-m": ClasstreeTextModelV1Medium,
+    "text-v1-l": ClasstreeTextModelV1Large,
 }
 
 

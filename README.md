@@ -1,14 +1,16 @@
-# Classia
+# Classtree
 
 ![](https://img.shields.io/pypi/pyversions/name)
 
-Classia is a hierarchical classifier for images or text.
+
+
+Classtree is a hierarchical classifier for images or text.
 
 ```shell
-pip install classia
+pip install classtree
 ```
 
-The fastest way to use Classia is to call the CLI on a folder of images or text files.
+The fastest way to use Classtree is to call the CLI on a folder of images or text files.
 
 ```shell
 train_data/
@@ -27,19 +29,19 @@ train_data/
 ```
 
 ```shell
-classia train images --model animals --dir train_data/animals
+classtree train images --model animals --dir train_data/animals
 ```
 
 or
 
 ```shell
-classia train text --model animals --dir train_data/animals
+classtree train text --model animals --dir train_data/animals
 ```
 
 And then use your model with the predict command.
 
 ```shell
-classia predict --model animals new_data/image304.jpg
+classtree predict --model animals new_data/image304.jpg
 > birds/raptors/eagle
 ```
 
@@ -48,20 +50,20 @@ classia predict --model animals new_data/image304.jpg
 You can download a pre-trained model using the download command.
 
 ```shell
-classia download model dbpedia
+classtree download model dbpedia
 ```
 
 Or download a pre-prepared dataset.
 
 ```shell
-classia download images inaturalist21-mini
-classia download text dbpedia
+classtree download images inaturalist21-mini
+classtree download text dbpedia
 ```
 
 If you want to fine-tune an existing model, you can use the `--from` flag during training with any downloaded model.
 
 ```shell
-classia train text --model animals --from dbpedia --dir train_data/animals
+classtree train text --model animals --from dbpedia --dir train_data/animals
 ```
 
 
@@ -84,11 +86,11 @@ classia train text --model animals --from dbpedia --dir train_data/animals
 You can test your model on a hold-out dataset using the `test` command.
 
 ```shell
-classia test --model animals --dir=test_data/animals
+classtree test --model animals --dir=test_data/animals
 ```
 
 ## Licensing
 
-Classia is available for non-commercial internal research use by academic institutions or not-for-profit organisations only, free of charge. Please, see the [license](./LICENSE.txt) for further details. To the extent permitted by applicable law, your use is at your own risk and our liability is limited. Interested in a commercial license? For commercial queries, please email <aimlshop@adelaide.edu.au> with subject line “Classia Commercial License”. 
+Classtree is available for non-commercial internal research use by academic institutions or not-for-profit organisations only, free of charge. Please, see the [license](./LICENSE.txt) for further details. To the extent permitted by applicable law, your use is at your own risk and our liability is limited. Interested in a commercial license? For commercial queries, please email <aimlshop@adelaide.edu.au> with subject line “Classtree Commercial License”. 
 
 This is an [AIML Shop](https://shop.aiml.team) project.

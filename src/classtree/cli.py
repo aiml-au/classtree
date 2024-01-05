@@ -2,7 +2,7 @@ import argparse
 import logging
 import os
 
-from classia.dataset import hierarchy_and_labels_from_folder
+from .dataset import hierarchy_and_labels_from_folder
 from .download import download_model, download_text_dataset, download_image_dataset
 from .export import export_model
 from .test import test_model
@@ -22,12 +22,12 @@ def add_global_args(parser):
     parser.add_argument(
         "--datasets_dir",
         help="The path of the directory to store named datasets",
-        default=os.path.expanduser("~/.cache/classia/datasets"),
+        default=os.path.expanduser("~/.cache/classtree/datasets"),
     )
     parser.add_argument(
         "--models_dir",
         help="The path of the directory to store named models",
-        default=os.path.expanduser("~/.cache/classia/models"),
+        default=os.path.expanduser("~/.cache/classtree/models"),
     )
 
 
@@ -150,7 +150,7 @@ def add_export_args(export_parser):
     export_parser.add_argument(
         "--export_dir",
         help="The path of the directory to export models",
-        default=os.path.expanduser("~/.cache/classia"),
+        default=os.path.expanduser("~/.cache/classtree"),
     )
     export_parser.add_argument(
         "--text",

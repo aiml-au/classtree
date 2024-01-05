@@ -26,7 +26,7 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 from .hier import truncate_given_lca, FindLCA, SumDescendants
-from .dataset import ClassiaImageDataset, ClassiaTextDataset
+from .dataset import ClasstreeImageDataset, ClasstreeTextDataset
 from .loss import MarginLoss
 from .metrics import UniformLeafInfoMetric, DepthMetric, IsCorrect, operating_curve
 from .predict import pareto_optimal_predictions
@@ -56,13 +56,13 @@ def get_image_dataset(files, labels):
             Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.244, 0.225]),
         ]
     )
-    dataset = ClassiaImageDataset(files, labels, transform=transform)
+    dataset = ClasstreeImageDataset(files, labels, transform=transform)
     return dataset
 
 
 def get_text_dataset(files, labels, encoder):
     transform = encoder.transform()
-    dataset = ClassiaTextDataset(files, labels, transform=transform)
+    dataset = ClasstreeTextDataset(files, labels, transform=transform)
     return dataset
 
 

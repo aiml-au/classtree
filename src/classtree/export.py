@@ -1,6 +1,6 @@
 import torch
 
-from classia.models import model_classes
+from .models import model_classes
 
 
 def export_model(models_dir, model, device):

@@ -3,9 +3,9 @@ import os
 
 import torch
 
-from classia.dataset import hierarchy_and_labels_from_folder
-from classia.models import model_classes, get_text_encoder
-from classia.train import get_dataloader, evaluate, get_image_dataset, get_text_dataset
+from .dataset import hierarchy_and_labels_from_folder
+from .models import model_classes, get_text_encoder
+from .train import get_dataloader, evaluate, get_image_dataset, get_text_dataset
 
 LOGGER = logging.getLogger(__name__)
 
