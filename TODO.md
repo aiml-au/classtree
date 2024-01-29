@@ -1,12 +1,11 @@
 ### Documentation
-- [ ] Review LICENSE
 - [ ] Pydocs
 - [ ] Getting Started Guide
 
 ### Datasets
 - [x] Choose a demonstration dataset for images
 - [x] Choose a demonstration dataset for text
-- [ ] Dataset balancing
+- [ ] Automatic dataset balancing
 - [ ] Stratified validation splits
 - [ ] Collect and prepare more datasets
 - [ ] Allow for manifest files instead of directories
@@ -30,8 +29,5 @@
 - [ ] Add tools to export to other formats (e.g. ONNX)
 
 ### Publishing
-- [ ] Publish to PyPi
-- [ ] Move repository to GitHub
-- [ ] Set up a GitHub Actions pipeline to build and publish wheels
 - [ ] Build a live demo
 - [ ] Announce on social media
