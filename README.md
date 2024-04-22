@@ -1,7 +1,7 @@
 # Classtree
 
 ![](https://img.shields.io/github/actions/workflow/status/aiml-au/classtree/publish.yml)
-![](https://img.shields.io/pypi/v/classtree)
+[![](https://img.shields.io/pypi/v/classtree)](https://pypi.org/project/classtree/)
 
 Classtree is a hierarchical classifier for images or text.
 
