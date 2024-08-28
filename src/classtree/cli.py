@@ -153,18 +153,9 @@ def add_export_args(export_parser):
         default=os.path.expanduser("~/.cache/classtree"),
     )
     export_parser.add_argument(
-        "--text",
-        help="The directory of training documents, if training a text classifier",
-    )
-    export_parser.add_argument(
-        "--images",
-        help="The directory of training images, if training an image classifier",
-    )
-    export_parser.add_argument(
-        "--batch_size",
-        help="The batch size to use during training",
-        type=int,
-        default=64,
+        "--device",
+        help="The device to export on",
+        default="cuda" if torch.cuda.is_available() else "cpu",
     )
 
 
