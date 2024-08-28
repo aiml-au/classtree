@@ -3,8 +3,8 @@ import torch
 from .models import model_classes
 
 
-def export_model(models_dir, model, device):
-    checkpoint = torch.load(f"{models_dir}/{model}/best.pth")
+def export_model(models_dir, model_name, device):
+    checkpoint = torch.load(f"{models_dir}/{model_name}/best.pth")
     model_type = checkpoint["model_type"]
     tree = checkpoint["tree"]
 
@@ -36,7 +36,7 @@ def export_model(models_dir, model, device):
     torch.onnx.export(
         model,
         dummy_input,
-        f"{model}.onnx",
+        f"{model_name}.onnx",
         input_names=["input"],
         output_names=["output"],
         opset_version=11,
