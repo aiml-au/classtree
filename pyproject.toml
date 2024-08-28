@@ -7,7 +7,7 @@ name = "classtree"
 description = "A toolkit for hierarchical classification"
 dynamic = ["version"]
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.9,<3.12"
 license = {file = "LICENSE.txt"}
 keywords = ["classification", "hierarchical"]
 classifiers = [
@@ -15,9 +15,9 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "numpy",
+    "numpy==1.26.0",
     "torch",
-    "torchvision>=0.15,!=0.16.*,!=0.17.*",
+    "torchvision==0.15.2",
     "torchtext",
     "Pillow",
     "tqdm",
