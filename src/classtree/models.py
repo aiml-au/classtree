@@ -104,20 +104,6 @@ def get_model_id(type, version, size):
     return f"{type}-v{version}-{size}"
 
 
-def get_image_model(image_model_size, tree):
-    model_id = get_model_id("image", 1, image_model_size)
-    model_class = model_classes[model_id]
-
-    return model_class(tree)
-
-
-def get_text_model(tree, text_model_size):
-    model_id = get_model_id("image", 1, text_model_size)
-    model_class = model_classes[model_id]
-
-    return model_class(tree)
-
-
 def get_text_encoder(text_model_size):
     if text_model_size == "m":
         encoder = ROBERTA_BASE_ENCODER
