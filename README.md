@@ -55,7 +55,6 @@ classtree download --model dbpedia
 Or download a pre-prepared dataset.
 
 ```shell
-classtree download --images inaturalist21-mini
 classtree download --text dbpedia
 ```
 
@@ -70,7 +69,6 @@ classtree train text --model animals --from dbpedia --dir train_data/animals
 
 | Task                 | Name               | Size | Dataset                | Notes                                        |
 |----------------------|--------------------|------|------------------------|----------------------------------------------|
-| Image Classification | inaturalist21-mini | M    | inaturalist21-mini     | Non-commercial research/educational use only |
 | Text Classification  | dbpedia            | M    | dbpedia                |                                              |
 
 ### Available Datasets
