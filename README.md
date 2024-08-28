@@ -49,14 +49,14 @@ classtree predict --model animals new_data/image304.jpg
 You can download a pre-trained model using the download command.
 
 ```shell
-classtree download model dbpedia
+classtree download --model dbpedia
 ```
 
 Or download a pre-prepared dataset.
 
 ```shell
-classtree download images inaturalist21-mini
-classtree download text dbpedia
+classtree download --images inaturalist21-mini
+classtree download --text dbpedia
 ```
 
 If you want to fine-tune an existing model, you can use the `--from` flag during training with any downloaded model.
