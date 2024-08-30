@@ -9,7 +9,7 @@ LOGGER = logging.getLogger(__name__)
 REMOTE_BASE = "gs://aiml-shop-classia-public"
 
 model_urls = {
-    "dbpedia": f"{REMOTE_BASE}/models/dbpedia.zip",
+    "dbpedia": f"{REMOTE_BASE}/models/dbpedia2.zip",
 }
 
 dataset_urls = {
