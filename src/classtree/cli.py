@@ -1,6 +1,12 @@
 import argparse
 import logging
 import os
+import sys
+
+if not sys.warnoptions:
+    import warnings
+    warnings.simplefilter("ignore")
+
 
 from .dataset import hierarchy_and_labels_from_folder
 from .download import download_model, download_text_dataset, download_image_dataset
